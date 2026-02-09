@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>هاویر کشت - مدیریت استان‌ها</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="dashboard-style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- هدر داشبورد -->
+        <header class="dashboard-header">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-tractor"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>هاویر کشت</h1>
+                    <p>سیستم مدیریت کشاورزی و پیمانکاری</p>
+                </div>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-details">
+                    <div class="user-name" id="usernameDisplay">کاربر سیستم</div>
+                    <div class="user-role">مدیر استان‌ها</div>
+                </div>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    خروج از سیستم
+                </button>
+            </div>
+        </header>
+
+        <!-- محتوای اصلی -->
+        <main class="main-content">
+            <!-- پیام‌ها -->
+            <div id="messageBox" class="message-box" style="display: none;"></div>
+            
+            <!-- هدر محتوا -->
+            <div class="content-header">
+                <h2><i class="fas fa-map"></i> مدیریت استان‌ها</h2>
+                <p>در این بخش می‌توانید استان‌های مورد نظر خود را مدیریت کنید</p>
+            </div>
+
+            <!-- کارت مدیریت استان -->
+            <div class="management-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-plus-circle"></i> افزودن استان جدید</h3>
+                </div>
+                <div class="card-body">
+                    <div class="add-form">
+                        <div class="form-group">
+                            <label for="provinceNameInput">نام استان</label>
+                            <input 
+                                type="text" 
+                                id="provinceNameInput" 
+                                class="form-control" 
+                                placeholder="مثال: تهران"
+                                maxlength="50"
+                            >
+                            <small class="form-hint">نام استان باید فارسی و حداکثر ۵۰ کاراکتر باشد</small>
+                        </div>
+                        <button id="addProvinceBtn" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            افزودن استان
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- جدول استان‌ها -->
+            <div class="management-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-list"></i> لیست استان‌ها</h3>
+                    <div class="table-info" id="tableInfo">
+                        <span id="provinceCount">۰</span> استان یافت شد
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th width="50">ردیف</th>
+                                    <th>نام استان</th>
+                                    <th>تاریخ ایجاد</th>
+                                    <th>وضعیت</th>
+                                    <th width="120">عملیات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="provincesTableBody">
+                                <!-- داده‌ها اینجا لود می‌شوند -->
+                                <tr>
+                                    <td colspan="5" class="loading">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        در حال بارگذاری استان‌ها...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- صفحه‌بندی -->
+                    <div class="pagination" id="pagination" style="display: none;">
+                        <button id="prevPageBtn" class="page-btn" disabled>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <span class="page-info" id="pageInfo">صفحه 1 از 1</span>
+                        <button id="nextPageBtn" class="page-btn" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- فوتر -->
+        <footer class="dashboard-footer">
+            <div class="version-info">
+                © ۱۴۰۳ - سیستم مدیریت هاویر کشت - نسخه ۱.۰
+            </div>
+            <div class="api-status">
+                <span>وضعیت API:</span>
+                <div class="status-indicator" id="apiStatusIndicator"></div>
+                <span id="apiStatusText">در حال اتصال...</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- مودال تایید حذف -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> تایید حذف</h3>
+                <button class="close-modal" id="closeDeleteModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteMessage">آیا از حذف این استان اطمینان دارید؟</p>
+                <div class="modal-actions">
+                    <button id="confirmDeleteBtn" class="btn btn-danger">حذف استان</button>
+                    <button id="cancelDeleteBtn" class="btn btn-secondary">انصراف</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard-script.js"></script>
+</body>
+</html>

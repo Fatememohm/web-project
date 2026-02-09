@@ -1,0 +1,18 @@
+{
+    "platform": "node",
+    "node": "18",
+    "build": {
+      "command": "npm install",
+      "path": "."
+    },
+    "start": {
+      "command": "npm start"
+    },
+    "ports": [3000],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "/"
+      }
+    ]
+  }
