@@ -1,151 +1,724 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>هاویر کشت - مدیریت استان‌ها</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="dashboard-style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>داشبورد مدیریت | هاویر کشت</title>
+  <link rel="stylesheet" href="dashboard-style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="dashboard-container">
-        <!-- هدر داشبورد -->
-        <header class="dashboard-header">
-            <div class="logo-section">
-                <div class="logo-icon">
-                    <i class="fas fa-tractor"></i>
-                </div>
-                <div class="logo-text">
-                    <h1>هاویر کشت</h1>
-                    <p>سیستم مدیریت کشاورزی و پیمانکاری</p>
-                </div>
-            </div>
-            
-            <div class="user-info">
-                <div class="user-details">
-                    <div class="user-name" id="usernameDisplay">کاربر سیستم</div>
-                    <div class="user-role">مدیر استان‌ها</div>
-                </div>
-                <button class="logout-btn" id="logoutBtn">
-                    <i class="fas fa-sign-out-alt"></i>
-                    خروج از سیستم
-                </button>
-            </div>
-        </header>
-
-        <!-- محتوای اصلی -->
-        <main class="main-content">
-            <!-- پیام‌ها -->
-            <div id="messageBox" class="message-box" style="display: none;"></div>
-            
-            <!-- هدر محتوا -->
-            <div class="content-header">
-                <h2><i class="fas fa-map"></i> مدیریت استان‌ها</h2>
-                <p>در این بخش می‌توانید استان‌های مورد نظر خود را مدیریت کنید</p>
-            </div>
-
-            <!-- کارت مدیریت استان -->
-            <div class="management-card">
-                <div class="card-header">
-                    <h3><i class="fas fa-plus-circle"></i> افزودن استان جدید</h3>
-                </div>
-                <div class="card-body">
-                    <div class="add-form">
-                        <div class="form-group">
-                            <label for="provinceNameInput">نام استان</label>
-                            <input 
-                                type="text" 
-                                id="provinceNameInput" 
-                                class="form-control" 
-                                placeholder="مثال: تهران"
-                                maxlength="50"
-                            >
-                            <small class="form-hint">نام استان باید فارسی و حداکثر ۵۰ کاراکتر باشد</small>
-                        </div>
-                        <button id="addProvinceBtn" class="btn btn-primary">
-                            <i class="fas fa-plus"></i>
-                            افزودن استان
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- جدول استان‌ها -->
-            <div class="management-card">
-                <div class="card-header">
-                    <h3><i class="fas fa-list"></i> لیست استان‌ها</h3>
-                    <div class="table-info" id="tableInfo">
-                        <span id="provinceCount">۰</span> استان یافت شد
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th width="50">ردیف</th>
-                                    <th>نام استان</th>
-                                    <th>تاریخ ایجاد</th>
-                                    <th>وضعیت</th>
-                                    <th width="120">عملیات</th>
-                                </tr>
-                            </thead>
-                            <tbody id="provincesTableBody">
-                                <!-- داده‌ها اینجا لود می‌شوند -->
-                                <tr>
-                                    <td colspan="5" class="loading">
-                                        <i class="fas fa-spinner fa-spin"></i>
-                                        در حال بارگذاری استان‌ها...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <!-- صفحه‌بندی -->
-                    <div class="pagination" id="pagination" style="display: none;">
-                        <button id="prevPageBtn" class="page-btn" disabled>
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                        <span class="page-info" id="pageInfo">صفحه 1 از 1</span>
-                        <button id="nextPageBtn" class="page-btn" disabled>
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <!-- فوتر -->
-        <footer class="dashboard-footer">
-            <div class="version-info">
-                © ۱۴۰۳ - سیستم مدیریت هاویر کشت - نسخه ۱.۰
-            </div>
-            <div class="api-status">
-                <span>وضعیت API:</span>
-                <div class="status-indicator" id="apiStatusIndicator"></div>
-                <span id="apiStatusText">در حال اتصال...</span>
-            </div>
-        </footer>
-    </div>
-
-    <!-- مودال تایید حذف -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-exclamation-triangle"></i> تایید حذف</h3>
-                <button class="close-modal" id="closeDeleteModal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p id="deleteMessage">آیا از حذف این استان اطمینان دارید؟</p>
-                <div class="modal-actions">
-                    <button id="confirmDeleteBtn" class="btn btn-danger">حذف استان</button>
-                    <button id="cancelDeleteBtn" class="btn btn-secondary">انصراف</button>
-                </div>
-            </div>
+  <!-- Container اصلی -->
+  <div class="dashboard-container">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <!-- لوگو -->
+      <div class="sidebar-logo">
+        <div class="logo-icon">
+          <i class="fas fa-seedling"></i>
         </div>
-    </div>
+        <div class="logo-text">
+          <h2>هاویر کشت</h2>
+          <p>مدیریت هوشمند</p>
+        </div>
+      </div>
 
-    <script src="dashboard-script.js"></script>
+      <!-- دکمه تغییر تم -->
+      <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+        <span>تغییر تم</span>
+      </button>
+
+      <!-- منو -->
+      <nav class="sidebar-menu">
+        <div class="menu-section">
+          <h3>مدیریت اصلی</h3>
+          <ul>
+            <li class="menu-item active" data-section="dashboard">
+              <i class="fas fa-tachometer-alt"></i>
+              <span>داشبورد</span>
+            </li>
+            <li class="menu-item" data-section="province">
+              <i class="fas fa-globe-asia"></i>
+              <span>مدیریت استان‌ها</span>
+            </li>
+            <li class="menu-item" data-section="city">
+              <i class="fas fa-city"></i>
+              <span>مدیریت شهرستان‌ها</span>
+            </li>
+            <li class="menu-item" data-section="village">
+              <i class="fas fa-homestead"></i>
+              <span>مدیریت روستاها</span>
+            </li>
+            <li class="menu-item" data-section="users">
+              <i class="fas fa-user-tie"></i>
+              <span>مدیریت کاربران</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="menu-section">
+          <h3>ابزارها</h3>
+          <ul>
+            <li class="menu-item" data-section="settings">
+              <i class="fas fa-sliders-h"></i>
+              <span>تنظیمات</span>
+            </li>
+            <li class="menu-item" data-section="reports">
+              <i class="fas fa-chart-pie"></i>
+              <span>گزارشات</span>
+            </li>
+            <li class="menu-item" id="logoutBtn">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>خروج از سیستم</span>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <!-- اطلاعات کاربر -->
+      <div class="user-info">
+        <div class="user-avatar">
+          <i class="fas fa-user-crown"></i>
+        </div>
+        <div class="user-details">
+          <h4 id="usernameDisplay">مدیر سیستم</h4>
+          <p>سطح دسترسی: مدیرکل</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="main-header">
+        <div class="header-left">
+          <h1 id="pageTitle">داشبورد اصلی</h1>
+          <nav class="breadcrumb">
+            <a href="dashboard.html">خانه</a>
+            <i class="fas fa-chevron-left"></i>
+            <span id="breadcrumbCurrent">داشبورد</span>
+          </nav>
+        </div>
+        
+        <div class="header-right">
+          <div class="header-actions">
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input type="text" placeholder="جستجو در سیستم...">
+            </div>
+            <button class="header-btn" id="refreshBtn">
+              <i class="fas fa-redo"></i>
+            </button>
+            <button class="header-btn notification-btn" id="notificationBtn">
+              <i class="fas fa-bell"></i>
+              <span class="badge">3</span>
+            </button>
+            <button class="header-btn user-btn" id="userMenuBtn">
+              <i class="fas fa-user-circle"></i>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content Area -->
+      <div class="content-area">
+        <!-- Messages -->
+        <div class="message-container" id="messageContainer"></div>
+
+        <!-- Dashboard Content (Default) -->
+        <div class="content-section active" id="dashboardContent">
+          <div class="dashboard-header">
+            <div class="welcome-banner">
+              <div class="welcome-text">
+                <h2>به پنل مدیریت هاویر کشت خوش آمدید</h2>
+                <p>سیستم مدیریت جامع کشاورزی هوشمند</p>
+              </div>
+              <div class="welcome-icon">
+                <i class="fas fa-chart-network"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats Overview -->
+          <div class="stats-overview">
+            <div class="stat-card card-primary">
+              <div class="stat-content">
+                <div class="stat-icon">
+                  <i class="fas fa-globe-asia"></i>
+                </div>
+                <div class="stat-info">
+                  <h3 id="provinceCount">0</h3>
+                  <p>تعداد استان‌ها</p>
+                </div>
+              </div>
+              <div class="stat-trend up">
+                <i class="fas fa-arrow-up"></i>
+                <span>2.5%</span>
+              </div>
+            </div>
+            
+            <div class="stat-card card-secondary">
+              <div class="stat-content">
+                <div class="stat-icon">
+                  <i class="fas fa-city"></i>
+                </div>
+                <div class="stat-info">
+                  <h3 id="cityCount">0</h3>
+                  <p>تعداد شهرستان‌ها</p>
+                </div>
+              </div>
+              <div class="stat-trend up">
+                <i class="fas fa-arrow-up"></i>
+                <span>1.8%</span>
+              </div>
+            </div>
+            
+            <div class="stat-card card-accent">
+              <div class="stat-content">
+                <div class="stat-icon">
+                  <i class="fas fa-homestead"></i>
+                </div>
+                <div class="stat-info">
+                  <h3 id="villageCount">0</h3>
+                  <p>تعداد روستاها</p>
+                </div>
+              </div>
+              <div class="stat-trend down">
+                <i class="fas fa-arrow-down"></i>
+                <span>0.3%</span>
+              </div>
+            </div>
+            
+            <div class="stat-card card-warning">
+              <div class="stat-content">
+                <div class="stat-icon">
+                  <i class="fas fa-user-tie"></i>
+                </div>
+                <div class="stat-info">
+                  <h3 id="userCount">0</h3>
+                  <p>کاربران فعال</p>
+                </div>
+              </div>
+              <div class="stat-trend up">
+                <i class="fas fa-arrow-up"></i>
+                <span>4.2%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="quick-actions">
+            <h3><i class="fas fa-bolt"></i> اقدامات سریع</h3>
+            <div class="actions-grid">
+              <button class="action-btn" onclick="openModal('addProvinceModal')">
+                <i class="fas fa-plus-circle"></i>
+                <span>استان جدید</span>
+              </button>
+              <button class="action-btn" onclick="openModal('addCityModal')">
+                <i class="fas fa-plus-circle"></i>
+                <span>شهرستان جدید</span>
+              </button>
+              <button class="action-btn" onclick="openModal('addVillageModal')">
+                <i class="fas fa-plus-circle"></i>
+                <span>روستای جدید</span>
+              </button>
+              <button class="action-btn" onclick="openModal('addUserModal')">
+                <i class="fas fa-plus-circle"></i>
+                <span>کاربر جدید</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Province Management -->
+        <div class="content-section" id="provinceContent">
+          <div class="section-header">
+            <div class="section-title">
+              <i class="fas fa-globe-asia"></i>
+              <h2>مدیریت استان‌ها</h2>
+            </div>
+            <button class="btn btn-gradient" id="addProvinceBtn">
+              <i class="fas fa-plus"></i>
+              <span>افزودن استان جدید</span>
+            </button>
+          </div>
+
+          <div class="data-card">
+            <div class="card-header">
+              <h3>لیست استان‌ها</h3>
+              <div class="table-controls">
+                <div class="search-input">
+                  <i class="fas fa-search"></i>
+                  <input type="text" id="provinceSearch" placeholder="جستجوی استان...">
+                </div>
+                <select id="provinceSort" class="form-control">
+                  <option value="name_asc">مرتب‌سازی: نام (صعودی)</option>
+                  <option value="name_desc">مرتب‌سازی: نام (نزولی)</option>
+                </select>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="data-table" id="provincesTable">
+                  <thead>
+                    <tr>
+                      <th>ردیف</th>
+                      <th>نام استان</th>
+                      <th>تاریخ ایجاد</th>
+                      <th>عملیات</th>
+                    </tr>
+                  </thead>
+                  <tbody id="provincesList">
+                    <!-- Data will be loaded here -->
+                  </tbody>
+                </table>
+              </div>
+              <div class="table-footer">
+                <div class="pagination" id="provincePagination"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- City Management -->
+        <div class="content-section" id="cityContent">
+          <div class="section-header">
+            <div class="section-title">
+              <i class="fas fa-city"></i>
+              <h2>مدیریت شهرستان‌ها</h2>
+            </div>
+            <button class="btn btn-gradient" id="addCityBtn">
+              <i class="fas fa-plus"></i>
+              <span>افزودن شهرستان جدید</span>
+            </button>
+          </div>
+
+          <div class="data-card">
+            <div class="card-header">
+              <h3>لیست شهرستان‌ها</h3>
+              <div class="table-controls">
+                <div class="search-input">
+                  <i class="fas fa-search"></i>
+                  <input type="text" id="citySearch" placeholder="جستجوی شهرستان...">
+                </div>
+                <select id="provinceFilter" class="form-control">
+                  <option value="">همه استان‌ها</option>
+                </select>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="data-table" id="citiesTable">
+                  <thead>
+                    <tr>
+                      <th>ردیف</th>
+                      <th>نام شهرستان</th>
+                      <th>استان</th>
+                      <th>تاریخ ایجاد</th>
+                      <th>عملیات</th>
+                    </tr>
+                  </thead>
+                  <tbody id="citiesList">
+                    <!-- Data will be loaded here -->
+                  </tbody>
+                </table>
+              </div>
+              <div class="table-footer">
+                <div class="pagination" id="cityPagination"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Village Management -->
+        <div class="content-section" id="villageContent">
+          <div class="section-header">
+            <div class="section-title">
+              <i class="fas fa-homestead"></i>
+              <h2>مدیریت روستاها</h2>
+            </div>
+            <button class="btn btn-gradient" id="addVillageBtn">
+              <i class="fas fa-plus"></i>
+              <span>افزودن روستای جدید</span>
+            </button>
+          </div>
+
+          <div class="data-card">
+            <div class="card-header">
+              <h3>لیست روستاها</h3>
+              <div class="table-controls">
+                <div class="search-input">
+                  <i class="fas fa-search"></i>
+                  <input type="text" id="villageSearch" placeholder="جستجوی روستا...">
+                </div>
+                <select id="cityFilter" class="form-control">
+                  <option value="">همه شهرستان‌ها</option>
+                </select>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="data-table" id="villagesTable">
+                  <thead>
+                    <tr>
+                      <th>ردیف</th>
+                      <th>نام روستا</th>
+                      <th>شهرستان</th>
+                      <th>استان</th>
+                      <th>تاریخ ایجاد</th>
+                      <th>عملیات</th>
+                    </tr>
+                  </thead>
+                  <tbody id="villagesList">
+                    <!-- Data will be loaded here -->
+                  </tbody>
+                </table>
+              </div>
+              <div class="table-footer">
+                <div class="pagination" id="villagePagination"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Users Management -->
+        <div class="content-section" id="usersContent">
+          <div class="section-header">
+            <div class="section-title">
+              <i class="fas fa-user-tie"></i>
+              <h2>مدیریت کاربران</h2>
+            </div>
+            <button class="btn btn-gradient" id="addUserBtn">
+              <i class="fas fa-plus"></i>
+              <span>کاربر جدید</span>
+            </button>
+          </div>
+
+          <div class="data-card">
+            <div class="card-header">
+              <h3>لیست کاربران</h3>
+              <div class="table-controls">
+                <div class="search-input">
+                  <i class="fas fa-search"></i>
+                  <input type="text" id="userSearch" placeholder="جستجوی کاربر...">
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="data-table" id="usersTable">
+                  <thead>
+                    <tr>
+                      <th>ردیف</th>
+                      <th>نام کاربری</th>
+                      <th>نام کامل</th>
+                      <th>ایمیل</th>
+                      <th>تلفن</th>
+                      <th>نقش</th>
+                      <th>وضعیت</th>
+                      <th>عملیات</th>
+                    </tr>
+                  </thead>
+                  <tbody id="usersList">
+                    <!-- Data will be loaded here -->
+                  </tbody>
+                </table>
+              </div>
+              <div class="table-footer">
+                <div class="pagination" id="userPagination"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="content-section" id="settingsContent">
+          <div class="section-header">
+            <div class="section-title">
+              <i class="fas fa-sliders-h"></i>
+              <h2>تنظیمات سیستم</h2>
+            </div>
+          </div>
+          
+          <div class="settings-grid">
+            <div class="settings-card">
+              <h3><i class="fas fa-key"></i> تغییر رمز عبور</h3>
+              <form id="changePasswordForm">
+                <div class="form-group">
+                  <label>رمز عبور فعلی *</label>
+                  <div class="password-input">
+                    <input type="password" id="currentPassword" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword('currentPassword')">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>رمز عبور جدید *</label>
+                  <div class="password-input">
+                    <input type="password" id="newPassword" required minlength="6">
+                    <button type="button" class="password-toggle" onclick="togglePassword('newPassword')">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                  <small class="form-text">رمز عبور باید حداقل ۶ کاراکتر باشد</small>
+                </div>
+                <div class="form-group">
+                  <label>تکرار رمز عبور جدید *</label>
+                  <div class="password-input">
+                    <input type="password" id="confirmPassword" required minlength="6">
+                    <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-gradient">
+                  <i class="fas fa-save"></i>
+                  <span>ذخیره تغییرات</span>
+                </button>
+              </form>
+            </div>
+            
+            <div class="settings-card">
+              <h3><i class="fas fa-bell"></i> تنظیمات اعلان‌ها</h3>
+              <div class="switch-group">
+                <label class="switch">
+                  <input type="checkbox" id="emailNotifications" checked>
+                  <span class="slider"></span>
+                  <span>اعلان‌های ایمیلی</span>
+                </label>
+                <label class="switch">
+                  <input type="checkbox" id="pushNotifications" checked>
+                  <span class="slider"></span>
+                  <span>اعلان‌های سیستم</span>
+                </label>
+                <label class="switch">
+                  <input type="checkbox" id="smsNotifications">
+                  <span class="slider"></span>
+                  <span>اعلان‌های پیامکی</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="main-footer">
+        <div class="footer-content">
+          <div class="footer-left">
+            <p><i class="fas fa-copyright"></i> ۱۴۰۳ هاویر کشت - نسخه ۳.۲.۱</p>
+          </div>
+          <div class="footer-right">
+            <div class="api-status">
+              <span>وضعیت سیستم:</span>
+              <span class="status-indicator" id="apiStatus">
+                <i class="fas fa-circle"></i>
+                <span>متصل</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Modals -->
+  <!-- Add Province Modal -->
+  <div class="modal" id="addProvinceModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-globe-asia"></i> افزودن استان جدید</h3>
+        <button class="modal-close" onclick="closeModal('addProvinceModal')">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="provinceForm">
+          <div class="form-group">
+            <label>نام استان *</label>
+            <input type="text" id="provinceName" placeholder="مثال: تهران" required>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('addProvinceModal')">
+              انصراف
+            </button>
+            <button type="submit" class="btn btn-gradient">
+              <i class="fas fa-plus"></i>
+              <span>افزودن استان</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add City Modal -->
+  <div class="modal" id="addCityModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-city"></i> افزودن شهرستان جدید</h3>
+        <button class="modal-close" onclick="closeModal('addCityModal')">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="cityForm">
+          <div class="form-group">
+            <label>استان *</label>
+            <select id="cityProvinceSelect" required>
+              <option value="">انتخاب استان</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>نام شهرستان *</label>
+            <input type="text" id="cityName" placeholder="مثال: شیراز" required>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('addCityModal')">
+              انصراف
+            </button>
+            <button type="submit" class="btn btn-gradient">
+              <i class="fas fa-plus"></i>
+              <span>افزودن شهرستان</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Village Modal -->
+  <div class="modal" id="addVillageModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-homestead"></i> افزودن روستای جدید</h3>
+        <button class="modal-close" onclick="closeModal('addVillageModal')">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="villageForm">
+          <div class="form-group">
+            <label>شهرستان *</label>
+            <select id="villageCitySelect" required>
+              <option value="">انتخاب شهرستان</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>نام روستا *</label>
+            <input type="text" id="villageName" placeholder="مثال: روستای نمونه" required>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('addVillageModal')">
+              انصراف
+            </button>
+            <button type="submit" class="btn btn-gradient">
+              <i class="fas fa-plus"></i>
+              <span>افزودن روستا</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add User Modal -->
+  <div class="modal" id="addUserModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-user-plus"></i> ایجاد کاربر جدید</h3>
+        <button class="modal-close" onclick="closeModal('addUserModal')">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="userForm">
+          <div class="form-group">
+            <label>نام کاربری *</label>
+            <input type="text" id="userUsername" placeholder="username" required>
+          </div>
+          <div class="form-group">
+            <label>رمز عبور *</label>
+            <div class="password-input">
+              <input type="password" id="userPassword" placeholder="حداقل ۶ کاراکتر" required minlength="6">
+              <button type="button" class="password-toggle" onclick="togglePassword('userPassword')">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>نام کامل *</label>
+            <input type="text" id="userFullName" placeholder="نام و نام خانوادگی" required>
+          </div>
+          <div class="form-group">
+            <label>ایمیل *</label>
+            <input type="email" id="userEmail" placeholder="user@example.com" required>
+          </div>
+          <div class="form-group">
+            <label>شماره تلفن</label>
+            <input type="tel" id="userPhoneNumber" placeholder="09123456789">
+          </div>
+          <div class="form-group">
+            <label>نقش کاربر *</label>
+            <select id="userRoleId" required>
+              <option value="">انتخاب نقش</option>
+              <option value="1">مدیر سیستم</option>
+              <option value="2">کاربر عادی</option>
+              <option value="3">کارشناس</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="switch">
+              <input type="checkbox" id="userDisabled">
+              <span class="slider"></span>
+              <span>کاربر غیرفعال</span>
+            </label>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('addUserModal')">
+              انصراف
+            </button>
+            <button type="submit" class="btn btn-gradient">
+              <i class="fas fa-plus"></i>
+              <span>ایجاد کاربر</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal" id="deleteModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-exclamation-triangle"></i> تأیید حذف</h3>
+        <button class="modal-close" onclick="closeModal('deleteModal')">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="delete-icon">
+          <i class="fas fa-trash-alt"></i>
+        </div>
+        <p id="deleteMessage">آیا از حذف این آیتم اطمینان دارید؟</p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('deleteModal')">
+            انصراف
+          </button>
+          <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+            <i class="fas fa-trash"></i>
+            <span>حذف</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="dashboard-script.js"></script>
 </body>
 </html>
